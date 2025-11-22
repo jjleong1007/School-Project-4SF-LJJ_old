@@ -1,0 +1,165 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    /* 1. I changed the background to a dark gradient so you can SEE the white bubbles */
+    background: linear-gradient(to bottom, #1e3c72, #2a5298); 
+    color: #333; 
+    min-height: 100vh; /* Ensures background covers whole screen */
+    overflow-x: hidden;
+}
+
+header {
+    background: rgba(244, 161, 0, 0.9); /* Added transparency */
+    padding: 20px;
+    text-align: center;
+    color: white;
+    font-size: 28px;
+    position: relative;
+    z-index: 10; /* Keeps header above bubbles */
+}
+
+nav {
+    display: flex;
+    background: rgba(51, 51, 51, 0.8); /* Added transparency */
+    position: relative;
+    z-index: 10;
+}
+
+nav a {
+    flex: 1;
+    padding: 14px;
+    text-align: center;
+    color: white;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+nav a:hover {
+    background: #555;
+}
+
+.content-section {
+    display: none;
+    padding: 20px;
+    /* Added white background to text so it's readable against the dark body */
+    background: rgba(255, 255, 255, 0.9); 
+    margin: 20px;
+    border-radius: 10px;
+    position: relative;
+    z-index: 10;
+  color: white;
+   background-image: url("https://images.unsplash.com/photo-1633787943048-0a053218718e?crop=entropy&cs=srgb&fm=jpg&ixid=M3wzMjM4NDZ8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NjM4MDQ5OTB8&ixlib=rb-4.1.0&q=85");
+   background-size: cover; /* Ensures the image covers the entire element, cropping if necessary */
+  background-position: center center; /* Centers the image horizontally and vertically */
+  background-repeat: no-repeat; /* Prevents the image from repeating if it doesn't cover the entire area */
+
+}
+
+.active {
+    display: block;
+}
+
+.form-box {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 400px;
+    margin: auto;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+}
+
+input, textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+button {
+    padding: 10px 20px;
+    border: none;
+    background: #f4a100;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+button:hover {
+    background: #d48800;
+}
+
+.response {
+    color: green;
+    margin-top: 10px;
+} /* <--- 2. THIS CLOSING BRACE WAS MISSING IN YOUR CODE */
+
+/* --- ANIMATED BACKGROUND --- */
+
+.bubbles {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1; /* Sits behind text (if text has higher index) but visible */
+    pointer-events: none;
+}
+
+.bubbles span {
+    position: absolute;
+    bottom: -50px;
+    width: 20px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.2); /* White transparent bubbles */
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(255,255,255,0.1);
+    animation: rise 10s infinite ease-in;
+}
+
+@keyframes rise {
+    0% { transform: translateY(0) scale(1); opacity: 0; }
+    20% { opacity: 1; }
+    100% { transform: translateY(-100vh) scale(1.5); opacity: 0; }
+}
+
+/* Individual bubble settings */
+.bubbles span:nth-child(1) { left: 10%; width: 40px; height: 40px; animation-duration: 8s; }
+.bubbles span:nth-child(2) { left: 20%; width: 20px; height: 20px; animation-duration: 12s; animation-delay: 1s; }
+.bubbles span:nth-child(3) { left: 35%; width: 50px; height: 50px; animation-duration: 10s; animation-delay: 2s; }
+.bubbles span:nth-child(4) { left: 50%; width: 30px; height: 30px; animation-duration: 14s; animation-delay: 0s; }
+.bubbles span:nth-child(5) { left: 65%; width: 20px; height: 20px; animation-duration: 9s; animation-delay: 3s; }
+.bubbles span:nth-child(6) { left: 80%; width: 60px; height: 60px; animation-duration: 13s; animation-delay: 1s; }
+.bubbles span:nth-child(7) { left: 90%; width: 30px; height: 30px; animation-duration: 11s; animation-delay: 4s; }
+.bubbles span:nth-child(8) { left: 40%; width: 40px; height: 40px; animation-duration: 15s; animation-delay: 2s; }
+.bubbles span:nth-child(9) { left: 75%; width: 25px; height: 25px; animation-duration: 9.5s; animation-delay: 0.5s; }
+.bubbles span:nth-child(10){ left: 5%; width: 45px; height: 45px; animation-duration: 16s; animation-delay: 5s; }
+/* Common style for all section backgrounds */
+.section-content {
+    position: relative;
+    background-size: cover;
+    background-position: center;
+    border-radius: 10px;
+}
+
+.section-content::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.75); /* adjust transparency */
+    border-radius: inherit;
+    z-index: 0;
+}
+
+.section-content * {
+    position: relative;
+    z-index: 1;
+}
+
+
+}
