@@ -1,0 +1,83 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zero Hunger</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>Zero Hunger Awareness </header>
+   
+     <h5>By: Leong Jun Ji 3B1</h5> 
+  
+
+    <nav>
+        <a onclick="showTab('overview')">Overview</a>
+        <a onclick="showTab('causes')">Causes</a>
+        <a onclick="showTab('solutions')">Solutions</a>
+        <a onclick="showTab('takeaction')">Take Action</a>
+        <a onclick="showTab('feedback')">Feedback</a>
+    </nav>
+
+    <section id="overview" class="content-section active">
+        <h2>Overview</h2>
+        <p>Hunger remains one of the most urgent global challenges today, affecting millions of people across different countries, ages, and backgrounds. This section provides a broad understanding of what hunger is, why it continues to exist, and how it impacts communities around the world.
+
+Hunger is a serious issue that happens when people do not have regular access to enough safe and nutritious food to live healthy lives. Many families struggle with food insecurity due to poverty, conflict, climate change, rising food prices, and limited access to farming resources.
+
+Understanding the problem is an important first step toward solving it. By learning about the causes and effects, we can become more aware of the challenges many people face daily. This knowledge also helps us think about what actions we can take, both individually and as a community, to support the United Nations’ Sustainable Development Goal (SDG) 2: Zero Hunger.
+
+Together, we can help build a future where everyone has the food they need to grow, learn, and thrive.</p>
+    </section>
+
+    <section id="causes" class="content-section">
+        <h2>Causes</h2>
+        <p>Hunger is a global issue caused by many factors.
+Poverty: 
+Families do not have enough income to buy nutritious food or grow their own crops. In many places, conflict and war destroy farms, disrupt food supply chains, and force people to leave their homes, making it difficult to access basic resources.
+Climate change: Extreme weather events reduce food production. Farmers who depend on stable weather conditions are especially vulnerable, which leads to lower harvests and unstable food availability.
+Unequal food distribution also plays a big role. While some regions produce more than enough food, it does not always reach the people who need it most due to poor infrastructure or high prices. In addition, issues like food waste and limited access to modern farming technology make the situation worse.
+</p>
+    </section>
+
+    <section id="solutions" class="content-section">
+        <h2>Solutions</h2>
+        <p>•	Reducing Food Waste and Loss: A significant portion of food produced globally is wasted from the farm to the consumer. Reducing post-harvest losses through better infrastructure and storage is crucial. At the consumption level, focus on changing consumer behavior and improving supply chain efficiency to minimize waste in retail and households.</p>
+      •	Supporting Small Farmers and Increasing Their Income: Small-scale food producers, particularly women, are often the most vulnerable to hunger and poverty. Solutions involve ensuring they have secure access to land, technology, financial services, knowledge, and markets. Investments in rural infrastructure and fair trade mechanisms are essential to empower them to be effective drivers of food security </p>
+      •	Improving Access to Safe and Nutritious Food: Beyond simply reducing caloric deficits, solutions must address all forms of malnutrition, including micronutrient deficiencies. This involves strengthening social safety nets and school feeding programs to provide nutritious meals, and promoting dietary diversity through the production of varied crops.
+    </section>
+
+    <section id="takeaction" class="content-section">
+        <h1>Take Action</h1>
+        <h2>Minimize Food Waste</h2>
+      <p>This is arguably the most direct way to contribute, as approximately one-third of all food produced for human consumption is lost or wasted globally</p>
+      <p>•	Be a Conscientious Consumer: Plan meals and create shopping lists to avoid impulse buys, which are often the source of waste. This aligns with Target 12.3 (part of SDG 12, but critical for SDG 2), which aims to halve per capita global food waste at the retail and consumer levels.</p>
+      <p>•	Love Your Leftovers: Properly store food, utilize freezing for perishable items, and creatively repurpose leftovers. This ensures that the energy, water, and resources used to produce the food are not wasted.
+      <p> •	Compost: For food scraps that truly cannot be consumed (like peels or coffee grounds), composting returns nutrients to the soil, which supports healthy, sustainable agriculture and reduces methane emissions from landfills. </p>
+    </section>
+
+    <section id="feedback" class="content-section">
+        <h2>Feedback Form</h2>
+        <div class="form-box">
+            <label>Your Name:</label>
+            <input type="text" id="name">
+
+            <label>Your Feedback:</label>
+            <textarea id="feedbackText" rows="4"></textarea>
+
+            <button onclick="submitFeedback()">Submit</button>
+            <p id="responseMsg" class="response"></p>
+        </div>
+    </section>
+
+    <!-- Animated Bubbles -->
+    <div class="bubbles">
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
