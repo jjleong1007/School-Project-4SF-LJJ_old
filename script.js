@@ -393,3 +393,329 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+
+// -------------------- Dialog open/close behavior --------------------
+    (function(){
+      const playBtn = document.getElementById('playGameBtn');
+      const dialog = document.getElementById('gameDialog');
+      const closeBtn = document.getElementById('game-closeBtn');
+      const openInNew = document.getElementById('game-openInNew');
+
+      playBtn.addEventListener('click', () => {
+        if (typeof dialog.showModal === 'function') {
+          dialog.showModal();
+          // focus the canvas for keyboard accessibility
+          setTimeout(() => {
+            const canvas = document.getElementById('game-canvas');
+            if (canvas) canvas.focus();
+          }, 250);
+        } else {
+          // fallback: open a simple new tab with just the game content if dialog unsupported
+          window.open(window.location.href, '_blank');
+        }
+      });
+
+      closeBtn.addEventListener('click', () => {
+        try { dialog.close(); } catch(e){}
+        // stop & reset the game
+        window.gameController && window.gameController.stopAndReset();
+      });
+
+      dialog.addEventListener('cancel', (ev) => {
+        // ESC pressed - ensure we stop the game
+        window.gameController && window.gameController.stopAndReset();
+      });
+
+      openInNew.addEventListener('click', () => {
+        // open the current page in a new tab — user can play there
+        window.open(window.location.href, '_blank');
+      });
+    })();
+
+ /**
+     * Simple shooter game inlined and namespaced to avoid collisions.
+     * Exposes a global gameController with stopAndReset() to stop the loop and reset state.
+     */
+
+    (function () {
+      // Elements (namespaced)
+      const canvas = document.getElementById('game-canvas');
+      const ctx = canvas.getContext('2d');
+      const scoreEl = document.getElementById('game-score');
+      const startScreen = document.getElementById('game-startScreen');
+      const startBtn = document.getElementById('game-startBtn');
+      const gameOverEl = document.getElementById('game-gameOver');
+      const finalScoreEl = document.getElementById('game-finalScore');
+      const restartBtn = document.getElementById('game-restartBtn');
+
+      // Game state variables (all prefixed)
+      let gameRunning = false;
+      let gameScore = 0;
+      let enemySpawnTimer = 0;
+      const ENEMY_SPAWN_INTERVAL = 120; // frames
+
+      // Player
+      const player = {
+        x: canvas.width / 2,
+        y: canvas.height - 100,
+        width: 60,
+        height: 30,
+        speed: 0.2
+      };
+
+      // Entities
+      const bullets = [];
+      const enemies = [];
+
+      // Mouse pos
+      let mouseX = player.x;
+      let mouseY = player.y;
+
+      // Animation frame handle
+      let rafId = null;
+
+      // Utility: resize canvas to container size while preserving aspect ratio
+      function resizeCanvasToContainer() {
+        const container = canvas.parentElement;
+        const rect = container.getBoundingClientRect();
+
+        // Maintain 920x640 internal resolution scaled to container
+        const internalW = 920, internalH = 640;
+        const scale = Math.min(rect.width / internalW, rect.height / internalH);
+        canvas.style.width = Math.round(internalW * scale) + 'px';
+        canvas.style.height = Math.round(internalH * scale) + 'px';
+
+        // Set logical size to internal resolution (keeps coordinates stable)
+        canvas.width = internalW;
+        canvas.height = internalH;
+      }
+
+      // Event listeners
+      function onMouseMove(e) {
+        if (!gameRunning) return;
+        const rect = canvas.getBoundingClientRect();
+        // map client coordinates to canvas logical coordinates (account for style scale)
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        mouseX = (e.clientX - rect.left) * scaleX;
+        mouseY = (e.clientY - rect.top) * scaleY;
+      }
+
+      function onCanvasClick(e) {
+        if (!gameRunning) return;
+        bullets.push({
+          x: player.x,
+          y: player.y - player.height / 2,
+          width: 5,
+          height: 15,
+          speed: 7
+        });
+      }
+
+      // Start / Reset / Stop
+      function startGame() {
+        gameRunning = true;
+        startScreen.style.display = 'none';
+        gameOverEl.style.display = 'none';
+        resetGame();
+        // ensure canvas has current size
+        resizeCanvasToContainer();
+        // register mouse listeners on scaled canvas
+        canvas.addEventListener('mousemove', onMouseMove);
+        canvas.addEventListener('click', onCanvasClick);
+        // start loop
+        cancelAnimationFrame(rafId);
+        rafId = requestAnimationFrame(gameLoop);
+      }
+
+      function resetGame() {
+        gameScore = 0;
+        enemySpawnTimer = 0;
+        bullets.length = 0;
+        enemies.length = 0;
+        player.x = canvas.width / 2;
+        player.y = canvas.height - 100;
+        updateScoreDisplay();
+      }
+
+      function stopAndReset() {
+        gameRunning = false;
+        cancelAnimationFrame(rafId);
+        rafId = null;
+        // cleanup listeners
+        canvas.removeEventListener('mousemove', onMouseMove);
+        canvas.removeEventListener('click', onCanvasClick);
+        // reset overlays
+        startScreen.style.display = 'flex';
+        gameOverEl.style.display = 'none';
+        resetGame();
+      }
+
+      // Update functions
+      function updatePlayer() {
+        player.x += (mouseX - player.x) * player.speed;
+        player.y += (mouseY - player.y) * player.speed;
+        player.x = Math.max(player.width / 2, Math.min(canvas.width - player.width / 2, player.x));
+        player.y = Math.max(player.height / 2, Math.min(canvas.height - player.height / 2, player.y));
+      }
+
+      function updateBullets() {
+        for (let i = bullets.length - 1; i >= 0; i--) {
+          bullets[i].y -= bullets[i].speed;
+          if (bullets[i].y < -bullets[i].height) bullets.splice(i, 1);
+        }
+      }
+
+      function updateEnemies() {
+        enemySpawnTimer++;
+        if (enemySpawnTimer >= ENEMY_SPAWN_INTERVAL) {
+          const enemyTypes = ['poverty','hunger'];
+          const r = Math.floor(Math.random()*enemyTypes.length);
+          enemies.push({
+            x: Math.random() * (canvas.width - 100) + 50,
+            y: -25,
+            width: 80,
+            height: 30,
+            text: enemyTypes[r],
+            speed: 2 + Math.random() * 2
+          });
+          enemySpawnTimer = 0;
+        }
+
+        for (let i = enemies.length - 1; i >= 0; i--) {
+          enemies[i].y += enemies[i].speed;
+          if (enemies[i].y > canvas.height + enemies[i].height) {
+            enemies.splice(i, 1);
+          }
+        }
+      }
+
+      function checkCollisions() {
+        // bullet vs enemy
+        for (let i = bullets.length - 1; i >= 0; i--) {
+          for (let j = enemies.length - 1; j >= 0; j--) {
+            if (isColliding(bullets[i], enemies[j])) {
+              bullets.splice(i,1);
+              enemies.splice(j,1);
+              gameScore += 10;
+              updateScoreDisplay();
+              break;
+            }
+          }
+        }
+
+        // player vs enemy
+        for (let i = enemies.length - 1; i >= 0; i--) {
+          if (isColliding(player, enemies[i])) {
+            triggerGameOver();
+            break;
+          }
+        }
+      }
+
+      function isColliding(a,b) {
+        return a.x - (a.width/2 || 0) < b.x + b.width &&
+               a.x + (a.width/2 || a.width) > b.x &&
+               a.y - (a.height/2 || 0) < b.y + b.height &&
+               a.y + (a.height/2 || a.height) > b.y;
+      }
+
+      // Draw
+      function draw() {
+        // Clear
+        ctx.fillStyle = '#1e1e1e';
+        ctx.fillRect(0,0,canvas.width,canvas.height);
+
+        // boundary
+        ctx.strokeStyle = '#333';
+        ctx.strokeRect(0,0,canvas.width,canvas.height);
+
+        // player (gun) - draw centered at player.x/player.y
+        drawGun(player.x, player.y, player.width, player.height);
+
+        // bullets
+        ctx.fillStyle = '#ffff00';
+        for (const b of bullets) {
+          ctx.fillRect(b.x - b.width/2, b.y - b.height/2, b.width, b.height);
+        }
+
+        // enemies as text on green blocks
+        ctx.font = 'bold 24px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        for (const en of enemies) {
+          ctx.fillStyle = '#00ff00';
+          ctx.fillRect(en.x - en.width/2, en.y - en.height/2, en.width, en.height);
+          ctx.fillStyle = '#000';
+          ctx.fillText(en.text, en.x, en.y);
+        }
+      }
+
+      function drawGun(x,y,width,height) {
+        ctx.fillStyle = '#ffffff';
+        // body
+        ctx.fillRect(x - width/2, y - height/2, width, height*0.6);
+        // barrel
+        ctx.fillRect(x - width/8, y - height, width/4, height*0.7);
+        // handle
+        ctx.fillRect(x - width/4, y + height*0.1, width/2, height*0.4);
+        // trigger
+        ctx.fillRect(x - width/8, y + height*0.3, width/4, height*0.1);
+      }
+
+      // Game loop
+      function gameLoop() {
+        if (!gameRunning) return; // stop the loop if flagged
+        updatePlayer();
+        updateBullets();
+        updateEnemies();
+        checkCollisions();
+        draw();
+        rafId = requestAnimationFrame(gameLoop);
+      }
+
+      // Game over
+      function triggerGameOver() {
+        gameRunning = false;
+        cancelAnimationFrame(rafId);
+        rafId = null;
+        finalScoreEl.textContent = String(gameScore);
+        gameOverEl.style.display = 'flex';
+        // remove listeners to avoid stray inputs
+        canvas.removeEventListener('mousemove', onMouseMove);
+        canvas.removeEventListener('click', onCanvasClick);
+      }
+
+      // Score UI
+      function updateScoreDisplay() {
+        scoreEl.textContent = `Score: ${gameScore}`;
+      }
+
+      // Wire controls
+      startBtn.addEventListener('click', () => {
+        startGame();
+      });
+
+      restartBtn.addEventListener('click', () => {
+        // restart from game-over screen
+        gameOverEl.style.display = 'none';
+        startGame();
+      });
+
+      // Resize handling
+      window.addEventListener('resize', () => resizeCanvasToContainer());
+
+      // Initial setup
+      resizeCanvasToContainer();
+      startScreen.style.display = 'flex';
+      gameOverEl.style.display = 'none';
+      updateScoreDisplay();
+
+      // Expose controller for dialog close cleaning
+      window.gameController = {
+        stopAndReset
+      };
+
+      // Accessibility: focus canvas when dialog opens (handled by dialog script)
+    })();
